@@ -1,6 +1,7 @@
 import ExpoZebraPrintConnect, {
   PrinterStatusResponse,
   PrintResponse,
+  PrintResponseWithData,
 } from "expo-zebra-print-connect";
 import { useState } from "react";
 import {
@@ -42,7 +43,7 @@ const StatusIndicator = ({
 const PrinterStatusView = ({
   status,
 }: {
-  status: PrinterStatusResponse["data"];
+  status: NonNullable<PrinterStatusResponse["data"]>;
 }) => {
   return (
     <View style={styles.statusContainer}>
@@ -91,7 +92,7 @@ const ActionButton = ({
   title: string;
   onPress: () => Promise<PrintResponse>;
   onError: (error: Error) => void;
-  onResponse: (response: PrintResponse) => void;
+  onResponse: (response: PrintResponseWithData) => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   return (
@@ -140,6 +141,7 @@ export default function App() {
             onResponse={(response) => {
               setPrinterStatus(null);
               setResponse(response.message);
+
               if (response.data) {
                 setPrinterStatus(
                   response.data as PrinterStatusResponse["data"]

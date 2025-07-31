@@ -1,26 +1,31 @@
 export interface PrintResponse {
   success: boolean;
   message: string;
-  data?: unknown;
+}
+export interface PrintResponseWithData<T = any> extends PrintResponse {
+  data?: T;
 }
 
-export interface PrinterStatusResponse extends PrintResponse {
-  data: {
-    isHeadCold: string;
-    isHeadOpen: string;
-    isPaused: string;
-    isRibbonOut: string;
-    isPaperOut: string;
-    isReceiveBufferFull: string;
-    isHeadTooHot: string;
-    isReadyToPrint: string;
-    friendlyName: string;
-    isPartialFormatInProgress: string;
-  };
+// Specific printer status data structure
+export interface PrinterStatusData {
+  isHeadCold: string;
+  isHeadOpen: string;
+  isPaused: string;
+  isRibbonOut: string;
+  isPaperOut: string;
+  isReceiveBufferFull: string;
+  isHeadTooHot: string;
+  isReadyToPrint: string;
+  friendlyName: string;
+  isPartialFormatInProgress: string;
 }
 
-export type PrintConnectModuleActions = {
+// Enhanced printer status response
+export interface PrinterStatusResponse
+  extends PrintResponseWithData<PrinterStatusData> {}
+
+export type PrintConnectActions = {
   unselectPrinter: () => Promise<PrintResponse>;
   getPrinterStatus: () => Promise<PrinterStatusResponse>;
-  print: (zpl: string) => Promise<PrintResponse>;
+  passthrough: (zpl: string) => Promise<PrintResponse>;
 };

@@ -1,15 +1,15 @@
 import { NativeModule, requireNativeModule } from "expo";
 
 import type {
-  PrintConnectModuleActions,
+  PrintConnectActions,
   PrinterStatusResponse,
   PrintResponse,
 } from "./ExpoZebraPrintConnect.types";
 
-declare class ExpoZebraPrintConnectModule extends NativeModule<PrintConnectModuleActions> {
+declare class ExpoZebraPrintConnectModule extends NativeModule<PrintConnectActions> {
   unselectPrinter: () => Promise<PrintResponse>;
   getPrinterStatus: () => Promise<PrinterStatusResponse>;
-  print: (zpl: string) => Promise<PrintResponse>;
+  passthrough: (zpl: string) => Promise<PrintResponse>;
 }
 
 // This call loads the native module object from the JSI.

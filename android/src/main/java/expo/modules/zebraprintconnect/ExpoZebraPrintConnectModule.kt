@@ -125,7 +125,11 @@ class PrintConnectService(private val context: Context) {
             )
 
             timeoutManager.startTimeout()
-            context.startForegroundService(intent)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
 
         } catch (e: Exception) {
             timeoutManager.cancelTimeout()
@@ -256,7 +260,7 @@ class ExpoZebraPrintConnectModule : Module() {
             )
         }
 
-        AsyncFunction("print") { zpl: String, promise: Promise ->
+        AsyncFunction("passthrough") { zpl: String, promise: Promise ->
             val context = getContextOrResolveError(promise) ?: return@AsyncFunction
             val service = PrintConnectService(context)
 
