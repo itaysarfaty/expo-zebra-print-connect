@@ -64,16 +64,16 @@ Retrieves the current status of the connected Zebra printer.
   success: boolean;
   message: string;
   data: {
-    isHeadCold: string;
-    isHeadOpen: string;
-    isPaused: string;
-    isRibbonOut: string;
-    isPaperOut: string;
-    isReceiveBufferFull: string;
-    isHeadTooHot: string;
-    isReadyToPrint: string;
     friendlyName: string;
-    isPartialFormatInProgress: string;
+    isHeadCold: boolean;
+    isHeadOpen: boolean;
+    isPaused: boolean;
+    isRibbonOut: boolean;
+    isPaperOut: boolean;
+    isReceiveBufferFull: boolean;
+    isHeadTooHot: boolean;
+    isReadyToPrint: boolean;
+    isPartialFormatInProgress: boolean;
   }
 }
 ```
@@ -119,15 +119,15 @@ const isPrinterReady = async () => {
   if (status.success) {
     const { data } = status;
 
-    if (data.isReadyToPrint === "true") {
+    if (data.isReadyToPrint) {
       console.log(`${data.friendlyName} is ready to print!`);
       return true;
     } else {
       console.log("Printer is not ready:");
-      if (data.isPaperOut === "true") console.log("- Paper is out");
-      if (data.isRibbonOut === "true") console.log("- Ribbon is out");
-      if (data.isHeadOpen === "true") console.log("- Head is open");
-      if (data.isHeadTooHot === "true") console.log("- Head is too hot");
+      if (data.isPaperOut) console.log("- Paper is out");
+      if (data.isRibbonOut) console.log("- Ribbon is out");
+      if (data.isHeadOpen) console.log("- Head is open");
+      if (data.isHeadTooHot) console.log("- Head is too hot");
       return false;
     }
   }
