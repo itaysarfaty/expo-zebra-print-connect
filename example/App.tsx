@@ -16,25 +16,20 @@ import {
 const StatusIndicator = ({
   label,
   value,
-  isPositive = false,
 }: {
   label: string;
-  value: string;
-  isPositive?: boolean;
+  value: boolean;
 }) => {
-  const isTrue = value.toLowerCase() === "true";
-  const shouldBeGreen = isPositive ? isTrue : !isTrue;
-
   return (
     <View style={styles.statusRow}>
       <Text style={styles.statusLabel}>{label}:</Text>
       <View
         style={[
           styles.statusIndicator,
-          { backgroundColor: shouldBeGreen ? "#4CAF50" : "#F44336" },
+          { backgroundColor: value ? "#4CAF50" : "#F44336" },
         ]}
       >
-        <Text style={styles.statusValue}>{isTrue ? "Yes" : "No"}</Text>
+        <Text style={styles.statusValue}>{value ? "Yes" : "No"}</Text>
       </View>
     </View>
   );
@@ -55,11 +50,7 @@ const PrinterStatusView = ({
 
       <View style={styles.statusSection}>
         <Text style={styles.sectionHeader}>System</Text>
-        <StatusIndicator
-          label="Ready to Print"
-          value={status.isReadyToPrint}
-          isPositive={true}
-        />
+        <StatusIndicator label="Ready to Print" value={status.isReadyToPrint} />
         <StatusIndicator label="Paused" value={status.isPaused} />
         <StatusIndicator
           label="Partial Format"
@@ -161,7 +152,7 @@ export default function App() {
           <ActionButton
             title="Print Test Label"
             onPress={() =>
-              ExpoZebraPrintConnect.print(
+              ExpoZebraPrintConnect.passthrough(
                 // 2" x 4" label, centered "Hello, World!"
                 "^XA" +
                   "^PW812" + // Set label width to 812 dots (4 inches at 203 dpi)

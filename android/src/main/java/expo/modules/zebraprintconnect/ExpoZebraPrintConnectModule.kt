@@ -41,6 +41,25 @@ object PrintConnectConstants {
     }
 }
 
+
+// Extension functions
+private fun ServiceResponse.toMap(): Map<String, Any?> {
+    return buildMap {
+        put("success", success)
+        put("message", message)
+        data?.let { put("data", it) }
+    }
+}
+
+private fun String.toUTF8ByteArray(): ByteArray? {
+    return try {
+        toByteArray(Charsets.UTF_8)
+    } catch (e: Exception) {
+        null
+    }
+}
+
+
 // Helper classes
 class TimeoutManager(private val promise: Promise) {
     private val handler = Handler(Looper.getMainLooper())
@@ -198,11 +217,31 @@ object ResultProcessors {
     fun getPrinterStatus(resultCode: Int, resultData: Bundle?): ServiceResponse {
         return if (resultCode == 0) {
             @Suppress("DEPRECATION")
-            val printerStatusMap = resultData?.getSerializable(PrintConnectConstants.PRINTER_STATUS_KEY) as? HashMap<*, *>
+            val printerStatusMap =
+                resultData?.getSerializable(PrintConnectConstants.PRINTER_STATUS_KEY) as? HashMap<*, *>
+
+            val printerStatusBooleanKeys = setOf(
+                "isHeadCold", "isHeadOpen", "isPaused", "isRibbonOut",
+                "isPaperOut", "isReceiveBufferFull", "isHeadTooHot",
+                "isReadyToPrint", "isPartialFormatInProgress"
+            )
+
+            val parsedStatusMap = printerStatusMap?.mapValues { (key, value) ->
+                if (key in printerStatusBooleanKeys) {
+                    when (value) {
+                        is Boolean -> value
+                        is String -> value.equals("true", ignoreCase = true)
+                        else -> false
+                    }
+                } else {
+                    value
+                }
+            }
+
             ServiceResponse(
                 success = true,
                 message = "Printer status retrieved successfully",
-                data = printerStatusMap
+                data = parsedStatusMap
             )
         } else {
             val errorMessage = resultData?.getString(PrintConnectConstants.ERROR_MESSAGE_KEY)
@@ -211,42 +250,27 @@ object ResultProcessors {
     }
 }
 
-// Extension functions
-private fun ServiceResponse.toMap(): Map<String, Any?> {
-    return buildMap {
-        put("success", success)
-        put("message", message)
-        data?.let { put("data", it) }
-    }
-}
-
-private fun String.toUTF8ByteArray(): ByteArray? {
-    return try {
-        toByteArray(Charsets.UTF_8)
-    } catch (e: Exception) {
-        null
-    }
-}
-
-
 
 class ExpoZebraPrintConnectModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
-  override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ExpoZebraPrintConnect')` in JavaScript.
-    Name("ExpoZebraPrintConnect")
-      AsyncFunction("unselectPrinter") { promise: Promise ->
+    // Each module class must implement the definition function. The definition consists of components
+    // that describes the module's functionality and behavior.
+    // See https://docs.expo.dev/modules/module-api for more details about available components.
+    override fun definition() = ModuleDefinition {
+        // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
+        // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
+        // The module will be accessible from `requireNativeModule('ExpoZebraPrintConnect')` in JavaScript.
+        Name("ExpoZebraPrintConnect")
+        AsyncFunction("unselectPrinter") { promise: Promise ->
             val context = getContextOrResolveError(promise) ?: return@AsyncFunction
             val service = PrintConnectService(context)
 
             val validationResult = service.validateEnvironment()
             if (!validationResult.isValid) {
                 promise.resolve(
-                    ServiceResponse(false, validationResult.errorMessage ?: "Unknown error occurred").toMap()
+                    ServiceResponse(
+                        false,
+                        validationResult.errorMessage ?: "Unknown error occurred"
+                    ).toMap()
                 )
                 return@AsyncFunction
             }
@@ -267,7 +291,10 @@ class ExpoZebraPrintConnectModule : Module() {
             val validationResult = service.validateEnvironment()
             if (!validationResult.isValid) {
                 promise.resolve(
-                    ServiceResponse(false, validationResult.errorMessage ?: "Unknown error occurred").toMap()
+                    ServiceResponse(
+                        false,
+                        validationResult.errorMessage ?: "Unknown error occurred"
+                    ).toMap()
                 )
                 return@AsyncFunction
             }
@@ -299,7 +326,10 @@ class ExpoZebraPrintConnectModule : Module() {
             val validationResult = service.validateEnvironment()
             if (!validationResult.isValid) {
                 promise.resolve(
-                    ServiceResponse(false, validationResult.errorMessage ?: "Unknown error occurred").toMap()
+                    ServiceResponse(
+                        false,
+                        validationResult.errorMessage ?: "Unknown error occurred"
+                    ).toMap()
                 )
                 return@AsyncFunction
             }

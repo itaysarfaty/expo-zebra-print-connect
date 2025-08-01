@@ -8,16 +8,16 @@ export interface PrintResponseWithData<T = any> extends PrintResponse {
 
 // Specific printer status data structure
 export interface PrinterStatusData {
-  isHeadCold: string;
-  isHeadOpen: string;
-  isPaused: string;
-  isRibbonOut: string;
-  isPaperOut: string;
-  isReceiveBufferFull: string;
-  isHeadTooHot: string;
-  isReadyToPrint: string;
   friendlyName: string;
-  isPartialFormatInProgress: string;
+  isHeadCold: boolean;
+  isHeadOpen: boolean;
+  isPaused: boolean;
+  isRibbonOut: boolean;
+  isPaperOut: boolean;
+  isReceiveBufferFull: boolean;
+  isHeadTooHot: boolean;
+  isReadyToPrint: boolean;
+  isPartialFormatInProgress: boolean;
 }
 
 // Enhanced printer status response
