@@ -22,7 +22,10 @@
     "expo-zebra-print-connect",
     "ExpoZebraPrintConnect"
   ],
-  "repository": "https://github.com/itaysarfaty/expo-zebra-print-connect",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itaysarfaty/expo-zebra-print-connect.git"
+  },
   "bugs": {
     "url": "https://github.com/itaysarfaty/expo-zebra-print-connect/issues"
   },
